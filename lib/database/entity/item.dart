@@ -4,4 +4,5 @@ import 'package:drift/drift.dart';
 class Items extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get item => text()();
+  BoolColumn get checked => boolean()();
 }

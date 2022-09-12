@@ -35,7 +35,10 @@ addNewDialog(BuildContext context) {
               }
 
               ItemsCompanion itemsCompanion = ItemsCompanion(
-                item: drift.Value(ctrlItem.text.trim()),
+                checked: const drift.Value(false),
+                item: drift.Value(
+                  ctrlItem.text.trim(),
+                ),
               );
 
               context.read<ProviderItem>().setItem(itemsCompanion);

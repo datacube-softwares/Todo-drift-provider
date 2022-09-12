@@ -10,12 +10,14 @@ part of 'database.dart';
 class Item extends DataClass implements Insertable<Item> {
   final int id;
   final String item;
-  const Item({required this.id, required this.item});
+  final bool checked;
+  const Item({required this.id, required this.item, required this.checked});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['item'] = Variable<String>(item);
+    map['checked'] = Variable<bool>(checked);
     return map;
   }
 
@@ -23,6 +25,7 @@ class Item extends DataClass implements Insertable<Item> {
     return ItemsCompanion(
       id: Value(id),
       item: Value(item),
+      checked: Value(checked),
     );
   }
 
@@ -32,6 +35,7 @@ class Item extends DataClass implements Insertable<Item> {
     return Item(
       id: serializer.fromJson<int>(json['id']),
       item: serializer.fromJson<String>(json['item']),
+      checked: serializer.fromJson<bool>(json['checked']),
     );
   }
   @override
@@ -40,55 +44,69 @@ class Item extends DataClass implements Insertable<Item> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'item': serializer.toJson<String>(item),
+      'checked': serializer.toJson<bool>(checked),
     };
   }
 
-  Item copyWith({int? id, String? item}) => Item(
+  Item copyWith({int? id, String? item, bool? checked}) => Item(
         id: id ?? this.id,
         item: item ?? this.item,
+        checked: checked ?? this.checked,
       );
   @override
   String toString() {
     return (StringBuffer('Item(')
           ..write('id: $id, ')
-          ..write('item: $item')
+          ..write('item: $item, ')
+          ..write('checked: $checked')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, item);
+  int get hashCode => Object.hash(id, item, checked);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Item && other.id == this.id && other.item == this.item);
+      (other is Item &&
+          other.id == this.id &&
+          other.item == this.item &&
+          other.checked == this.checked);
 }
 
 class ItemsCompanion extends UpdateCompanion<Item> {
   final Value<int> id;
   final Value<String> item;
+  final Value<bool> checked;
   const ItemsCompanion({
     this.id = const Value.absent(),
     this.item = const Value.absent(),
+    this.checked = const Value.absent(),
   });
   ItemsCompanion.insert({
     this.id = const Value.absent(),
     required String item,
-  }) : item = Value(item);
+    required bool checked,
+  })  : item = Value(item),
+        checked = Value(checked);
   static Insertable<Item> custom({
     Expression<int>? id,
     Expression<String>? item,
+    Expression<bool>? checked,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (item != null) 'item': item,
+      if (checked != null) 'checked': checked,
     });
   }
 
-  ItemsCompanion copyWith({Value<int>? id, Value<String>? item}) {
+  ItemsCompanion copyWith(
+      {Value<int>? id, Value<String>? item, Value<bool>? checked}) {
     return ItemsCompanion(
       id: id ?? this.id,
       item: item ?? this.item,
+      checked: checked ?? this.checked,
     );
   }
 
@@ -101,6 +119,9 @@ class ItemsCompanion extends UpdateCompanion<Item> {
     if (item.present) {
       map['item'] = Variable<String>(item.value);
     }
+    if (checked.present) {
+      map['checked'] = Variable<bool>(checked.value);
+    }
     return map;
   }
 
@@ -108,7 +129,8 @@ class ItemsCompanion extends UpdateCompanion<Item> {
   String toString() {
     return (StringBuffer('ItemsCompanion(')
           ..write('id: $id, ')
-          ..write('item: $item')
+          ..write('item: $item, ')
+          ..write('checked: $checked')
           ..write(')'))
         .toString();
   }
@@ -131,8 +153,15 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
   late final GeneratedColumn<String> item = GeneratedColumn<String>(
       'item', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
+  final VerificationMeta _checkedMeta = const VerificationMeta('checked');
   @override
-  List<GeneratedColumn> get $columns => [id, item];
+  late final GeneratedColumn<bool> checked = GeneratedColumn<bool>(
+      'checked', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: true,
+      defaultConstraints: 'CHECK (checked IN (0, 1))');
+  @override
+  List<GeneratedColumn> get $columns => [id, item, checked];
   @override
   String get aliasedName => _alias ?? 'items';
   @override
@@ -151,6 +180,12 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
     } else if (isInserting) {
       context.missing(_itemMeta);
     }
+    if (data.containsKey('checked')) {
+      context.handle(_checkedMeta,
+          checked.isAcceptableOrUnknown(data['checked']!, _checkedMeta));
+    } else if (isInserting) {
+      context.missing(_checkedMeta);
+    }
     return context;
   }
 
@@ -164,6 +199,8 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
           .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
       item: attachedDatabase.options.types
           .read(DriftSqlType.string, data['${effectivePrefix}item'])!,
+      checked: attachedDatabase.options.types
+          .read(DriftSqlType.bool, data['${effectivePrefix}checked'])!,
     );
   }
 

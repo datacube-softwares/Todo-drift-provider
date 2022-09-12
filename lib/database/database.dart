@@ -29,6 +29,16 @@ class AppDB extends _$AppDB {
     return await into(items).insert(itemsCompanion);
   }
 
+  setChecked(int itemId) async {
+    log("check item from db");
+    Item item =
+        await (select(items)..where((t) => t.id.equals(itemId))).getSingle();
+    bool check = !item.checked;
+    (update(items)..where((t) => t.id.equals(itemId)))
+        .write(ItemsCompanion(checked: Value(check)));
+    return check;
+  }
+
   deleteItems(int itemId) async {
     log("deteting item from db");
     return (delete(items)..where((t) => t.id.equals(itemId))).go();

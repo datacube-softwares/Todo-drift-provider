@@ -24,10 +24,24 @@ class HomePage extends StatelessWidget {
           if (itemsList.isNotEmpty) {
             return ListView.builder(
               itemCount: itemsList.length,
+              controller: ScrollController(),
               itemBuilder: (context, index) {
                 Item currentItem = itemsList[index];
                 return ListTile(
-                  title: Text(currentItem.item),
+                  leading: Checkbox(
+                    value: currentItem.checked,
+                    onChanged: (value) {
+                      context.read<ProviderItem>().setCheckUnckeck(currentItem);
+                    },
+                  ),
+                  title: Text(
+                    currentItem.item,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          decoration: currentItem.checked
+                              ? TextDecoration.lineThrough
+                              : TextDecoration.none,
+                        ),
+                  ),
                   trailing: IconButton(
                     onPressed: () {
                       context.read<ProviderItem>().removeItem(currentItem);
@@ -39,8 +53,11 @@ class HomePage extends StatelessWidget {
               },
             );
           } else {
-            return const Center(
-              child: Text("No items"),
+            return Center(
+              child: Text(
+                "No items",
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
             );
           }
         },
