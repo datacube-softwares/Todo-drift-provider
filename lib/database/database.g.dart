@@ -159,7 +159,7 @@ class $ItemsTable extends Items with TableInfo<$ItemsTable, Item> {
       'checked', aliasedName, false,
       type: DriftSqlType.bool,
       requiredDuringInsert: true,
-      defaultConstraints: 'CHECK (checked IN (0, 1))');
+      defaultConstraints: 'CHECK ("checked" IN (0, 1))');
   @override
   List<GeneratedColumn> get $columns => [id, item, checked];
   @override

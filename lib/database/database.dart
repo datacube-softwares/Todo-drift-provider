@@ -1,10 +1,11 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
 import 'package:drift_db_test/database/entity/item.dart';
 import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+
+import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 
 part 'database.g.dart';
@@ -12,6 +13,7 @@ part 'database.g.dart';
 @DriftDatabase(tables: [Items])
 class AppDB extends _$AppDB {
   // we tell the database where to store the data with this constructor
+//  AppDB(QueryExecutor e) : super(e);
   AppDB() : super(_openConnection());
 
   // you should bump this number whenever you change or add a table definition.
@@ -45,9 +47,9 @@ class AppDB extends _$AppDB {
   }
 }
 
-LazyDatabase _openConnection() {
+_openConnection() {
   // the LazyDatabase util lets us find the right location for the file async.
-  return LazyDatabase(() async {
+  LazyDatabase(() async {
     // put the database file, called db.sqlite here, into the documents folder
     // for your app.
     final dbFolder = await getApplicationDocumentsDirectory();
